@@ -49,7 +49,7 @@ const AboutPage = () => {
           "Simple is best"
         </blockquote>
         <p className="max-w-4xl mx-auto text-gray-300 leading-relaxed">
-        Saya adalah mahasiswa tehnik informatikan semester 2 yang berkuliah di Universitas Dr. Soetomo. Sebelum masuk kuliah saya bersekolah di SMKN 6 kota bekasi dengan jurusan RPL (Rekayasa Perangkat Lunak). Pengalaman kerja saya sangat tidak berhubungan dengan jurusan saya, seperti menjadi sales brand Handphone selama 6 bulan dan menjadi seorang digital marketer di showroom mobil selama 6 bulan dan untuk saat ini saya hanya membantu bisnis bapak saya. Pengalaman Programing saya hanya ilmu yang saya dapat dari Pada saat bersekolah di SMK, jujur saya merasa masih sangat butuh lebih banyak belajar lagi banyak aspek dari projek ini di bantu oleh teman saya. Oke sekian dari saya Terima kasih  
+        Saya adalah mahasiswa tehnik informatikan semester 2 yang berkuliah di Universitas Dr. Soetomo. Sebelum masuk kuliah saya bersekolah di SMKN 6 kota bekasi dengan jurusan RPL (Rekayasa Perangkat Lunak). Pengalaman kerja saya sangat tidak berhubungan dengan jurusan saya, seperti menjadi sales brand Handphone selama 6 bulan dan menjadi seorang digital marketer di showroom mobil selama 6 bulan dan untuk saat ini saya hanya membantu bisnis bapak saya. Pengalaman Programing saya hanya ilmu yang saya dapat dari Pada saat bersekolah di SMK, jujur saya merasa masih sangat butuh lebih banyak belajar lagi dan banyak aspek dari projek ini di bantu oleh teman saya. Oke sekian dari saya Terima kasih  
         </p>
       </section>
 
@@ -59,7 +59,7 @@ const AboutPage = () => {
           {Skills.map((skill) => (
             <div
               key={skill.name}
-              className="bg-[#2c2c3e] p-4 rounded-lg shadow-md hover:bg-yellow-500 hover:text-black transition-all flex flex-col items-center gap-2"
+              className="bg-[#2c2c3e] p-4 rounded-lg shadow-md hover:bg-yellow-400 hover:text-black transition-all flex flex-col items-center gap-2"
             >
               {skill.icon && React.cloneElement(skill.icon, { className: "w-10 h-10 mx-auto" })}
               <p>{skill.name}</p>
