@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,64 +10,102 @@ import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import jwt from "jsonwebtoken";
+import { Loader } from "lucide-react";
 
 export default function CreateNotePage() {
-    const [title, setTitle] = useState("");
-    const [content, setContent] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [payload, setPayload] = useState({})
-    const token = localStorage.getItem("token")
-     useEffect(() => {
-        if (!token) {
-            return router.push("/login");
-        }
-        const decodePayload = jwt.decode(token)
-        setPayload(decodePayload);
-    }, []);
-    const router = useRouter();
-    const { toast } = useToast();
-    const handleCreate = async () => {
-        if (!title.trim() || !content.trim()) {
-            toast({
-                title: "Gagal menyimpan",
-                description: "Judul dan isi tidak boleh kosong.",
-            });
-            return;
-        }
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [error, setError] = useState(false);
+  const [particles, setParticles] = useState([]);
+  const [isHovered, setIsHovered] = useState(false);
 
-        setLoading(true);
-        try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notes`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    id_user: payload.userId,
-                    title,
-                    content,
-                }),
-            });
+  const router = useRouter();
+  const { toast } = useToast();
 
-            if (!res.ok) throw new Error("Gagal menambahkan catatan");
+  useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+    if (!savedToken) {
+      router.push("/");
+    } else {
+      try {
+        const decodedToken = jwt.decode(savedToken);
+        setUser(decodedToken.userId);
+        setToken(savedToken);
+      } catch (error) {
+        console.error("Error decoding token", error);
+        router.push("/");
+      }
+    }
 
-            toast({
-                className: cn("bg-green-500", "text-white"),
-                title: "Catatan dibuat",
-                description: "Catatan berhasil ditambahkan.",
-            });
+    const timeout = setTimeout(() => setInitialLoading(false), 600);
+    return () => clearTimeout(timeout);
+  }, [router]);
 
-            router.push("/Notes");
-        } catch (error) {
-            toast({
-                title: "Gagal menyimpan",
-                description: "Terjadi kesalahan saat menambahkan catatan.",
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
+  useEffect(() => {
+    document.getElementById("title")?.focus();
+  }, []);
+
+  const handleCreate = async () => {
+    if (!title.trim() || !content.trim()) {
+      setError(true);
+      toast({
+        variant: "destructive",
+        title: "Gagal menyimpan",
+        description: "Judul dan isi tidak boleh kosong.",
+      });
+      return;
+    }
+
+    if (!token || !user) {
+      toast({
+        variant: "destructive",
+        title: "Gagal menyimpan",
+        description: "Token atau data pengguna tidak valid.",
+      });
+      return;
+    }
+
+    setLoading(true);
+    setError(false);
+
+    const requestBody = { id_user: user, title, content };
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Gagal menambahkan catatan");
+      }
+
+      toast({
+        className: cn("bg-green-500", "text-white"),
+        title: "Catatan dibuat",
+        description: "Catatan berhasil ditambahkan.",
+      });
+
+      router.push("/Notes");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Gagal menyimpan",
+        description: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+ };
 
     return (
         <Card className="bg-gray-700 border-black w-[400px] mx-auto p-6 space-y-4">
